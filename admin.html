@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雅集典藏 | 尊榮全功能品牌管理後台系統 (Zen Luxury Admin)</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            warmRice: '#F7F6F2',
+            obsidian: '#0D0C0B',
+            charcoal: '#161513',
+            subtleGray: '#73716B',
+            cinnabar: '#8C2D19',
+            matteGold: '#C2A675',
+            stoneBorder: '#E7E5E4'
+          },
+          fontFamily: {
+            serif: ['Noto Serif TC', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'Noto Sans TC', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0D0C0B; color: #F7F6F2; font-family: 'Noto Sans TC', sans-serif; }
+    .oriental-seal {
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1.5px solid #C2A675; color: #F7F6F2; padding: 2px 6px; font-size: 12px; font-weight: 700; border-radius: 2px;
+      background: #8C2D19;
+    }
+    .gold-badge {
+      background: linear-gradient(135deg, #C2A675 0%, #A38550 100%);
+      color: #FFFFFF; font-size: 11px; padding: 2px 8px; letter-spacing: 1px; border-radius: 2px; font-family: 'Noto Serif TC', serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const TRAFFIC_SOURCES = [
+      { source: 'facebook_live', label: 'FB 直播導流 (Live & UTM)', visits: 18450, percentage: 42.5, conv: 4.8, color: '#8C2D19' },
+      { source: 'google_seo', label: 'Google 自然搜尋 (SEO)', visits: 11200, percentage: 25.8, conv: 3.2, color: '#C2A675' },
+      { source: 'line', label: 'LINE 官方帳號諮詢', visits: 7800, percentage: 18.0, conv: 6.5, color: '#06C755' },
+      { source: 'direct', label: '直接訪問 (老藏家)', visits: 4100, percentage: 9.4, conv: 8.2, color: '#2563EB' },
+      { source: 'other', label: '外部媒體推薦', visits: 1850, percentage: 4.3, conv: 1.9, color: '#73716B' }
+    ];
+
+    const TOP_RANKING = [
+      { id: 'zs-001', sku: 'ZS-2026-088', name: '顧景舟款・原礦老紫泥仿古壺', cat: '紫砂', views: 4820, adds: 312, inq: 145, sales: 1, conv: 6.47, img: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?q=80&w=400&auto=format&fit=crop' },
+      { id: 'jd-001', sku: 'JD-2026-102', name: '緬甸老坑正陽綠玻璃種翡翠手鐲', cat: '翡翠', views: 3950, adds: 218, inq: 189, sales: 1, conv: 5.52, img: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=400&auto=format&fit=crop' },
+      { id: 'ab-001', sku: 'AB-2026-055', name: '天然緬甸金藍珀・大顆粒圓珠手串', cat: '琥珀', views: 3110, adds: 184, inq: 92, sales: 2, conv: 5.91, img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=400&auto=format&fit=crop' }
+    ];
+
+    const BULK_ITEMS = [
+      { row: 1, sku: 'ZS-2026-2001', name: '原礦朱泥大彬提梁壺', cat: '紫砂', price: 158000, imgMatch: true, videoMatch: true, err: '' },
+      { row: 2, sku: 'JD-2026-3012', name: '木那雪花棉滿綠帝王玉佩', cat: '翡翠', price: 480000, imgMatch: false, videoMatch: false, err: '缺少 Cloudflare R2 第 3 張細節圖與短影片' },
+      { row: 3, sku: 'AB-2026-1044', name: '緬甸多彩血蜜珀植物蟲珀', cat: '琥珀', price: 125000, imgMatch: true, videoMatch: true, err: '' }
+    ];
+
+    const ORDERS = [
+      { no: 'ORD-2026-0919-01', name: '台北張國強 董事長', phone: '0912-345-678', item: '顧景舟款・原礦老紫泥仿古壺', amount: 188000, deposit: 50000, status: '全額已付', cert: true, track: 'TAI-SEC-889021' },
+      { no: 'ORD-2026-0919-02', name: '台中陳淑芬 女士', phone: '0933-888-999', item: '緬甸老坑正陽綠玻璃種翡翠手鐲', amount: 368000, deposit: 100000, status: '預付定金中', cert: true, track: '待派專車' }
+    ];
+
+    function AdminApp() {
+      const [tab, setTab] = useState('traffic');
+      const [orderList, setOrderList] = useState(ORDERS);
+      const [liveNow, setLiveNow] = useState(true);
+      const [boundProducts, setBoundProducts] = useState(['zs-001', 'jd-001']);
+
+      const toggleCert = (no) => {
+        setOrderList(prev => prev.map(o => o.no === no ? { ...o, cert: !o.cert } : o));
+      };
+
+      const toggleBound = (id) => {
+        setBoundProducts(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col md:flex-row bg-[#0D0C0B] text-[#F7F6F2]">
+          {/* Sidebar */}
+          <aside className="w-full md:w-64 bg-[#0D0C0B] border-r border-[#C2A675]/20 p-6 flex flex-col justify-between shrink-0 font-serif">
+            <div className="space-y-6">
+              <div>
+                <span className="oriental-seal text-xs py-0.5 px-2">十載架構師</span>
+                <h2 className="font-bold text-xl text-white mt-1.5 tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white via-[#C2A675] to-white">
+                  雅集控台
+                </h2>
+              </div>
+              <nav className="space-y-1.5 text-xs">
+                {[
+                  { id: 'traffic', label: '流量與行為大數據' },
+                  { id: 'bulk', label: '2,000+ CSV/S3 匯入' },
+                  { id: 'orders', label: '訂單金流與保險專車' },
+                  { id: 'live', label: '行銷與 FB 直播控台' },
+                  { id: 'settings', label: '系統權限與 API Key' },
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTab(t.id)}
+                    className={`w-full text-left px-3.5 py-3 rounded-lg transition-all ${tab === t.id ? 'bg-[#8C2D19] text-white font-bold border border-[#C2A675]/40 shadow-lg' : 'text-stone-400 hover:text-white hover:bg-[#161513]'}`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+            <div className="pt-4 border-t border-[#C2A675]/20 text-xs">
+              <a href="/index.html" className="text-[#C2A675] hover:underline flex items-center gap-1">
+                ← 返回前台雅集展廳
+              </a>
+            </div>
+          </aside>
+
+          {/* Main Area */}
+          <main className="flex-1 p-8 space-y-8 overflow-y-auto">
+            {/* Top Bar */}
+            <div className="flex justify-between items-center border-b border-[#C2A675]/20 pb-4">
+              <input
+                type="text"
+                placeholder="全域搜尋 (SKU 編號 / 訂單號 / 客戶手機)..."
+                className="bg-[#161513] border border-[#C2A675]/30 rounded-lg px-4 py-1.5 text-xs text-white w-72 focus:outline-none focus:border-[#C2A675]"
+              />
+              <div className="text-xs font-serif text-[#C2A675] flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>超級全端架構師權限登入中 👤</span>
+              </div>
+            </div>
+
+            {/* Tab 1: 流量與行為分析 */}
+            {tab === 'traffic' && (
+              <div className="space-y-8">
+                <div>
+                  <span className="oriental-seal text-xs py-0.5 px-2">行為大數據</span>
+                  <h1 className="font-serif text-2xl font-bold text-white mt-1">流量來源與商品瀏覽排行大數據 (Traffic & Analytics)</h1>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+                  <div className="bg-[#161513] p-5 rounded-xl border border-[#C2A675]/20 shadow-xl">
+                    <span className="text-xs text-stone-400 font-serif">總獨立訪客數 (UV)</span>
+                    <div className="text-2xl font-serif text-white font-bold mt-1">43,400 人</div>
+                    <span className="text-xs text-emerald-400 mt-1 block">↑ +18.4% 較前週</span>
+                  </div>
+                  <div className="bg-[#161513] p-5 rounded-xl border border-[#C2A675]/20 shadow-xl">
+                    <span className="text-xs text-stone-400 font-serif">總瀏覽次數 (PV)</span>
+                    <div className="text-2xl font-serif text-white font-bold mt-1">186,520 次</div>
+                    <span className="text-xs text-emerald-400 mt-1 block">↑ +22.1% 較前週</span>
+                  </div>
+                  <div className="bg-[#161513] p-5 rounded-xl border border-[#C2A675]/20 shadow-xl">
+                    <span className="text-xs text-stone-400 font-serif">平均停留時間</span>
+                    <div className="text-2xl font-serif text-[#C2A675] font-bold mt-1">4 分 38 秒</div>
+                    <span className="text-xs text-emerald-400 mt-1 block">↑ +8.2%</span>
+                  </div>
+                  <div className="bg-[#161513] p-5 rounded-xl border border-[#C2A675]/20 shadow-xl">
+                    <span className="text-xs text-stone-400 font-serif">意向轉換率</span>
+                    <div className="text-2xl font-serif text-emerald-400 font-bold mt-1">5.85 %</div>
+                    <span className="text-xs text-rose-400 mt-1 block">↓ -0.3%</span>
+                  </div>
+                </div>
+
+                {/* Traffic Sources */}
+                <div className="bg-[#161513] p-6 rounded-xl border border-[#C2A675]/20 space-y-4 shadow-xl">
+                  <div className="flex justify-between items-center border-b border-stone-800 pb-3">
+                    <h3 className="font-serif font-bold text-lg text-white">訪客流量來源渠道與意向轉換佔比</h3>
+                    <span className="gold-badge">FB 直播導流居冠 42.5%</span>
+                  </div>
+                  <div className="w-full h-4 bg-[#0D0C0B] rounded-full overflow-hidden flex border border-stone-800">
+                    {TRAFFIC_SOURCES.map(s => (
+                      <div key={s.source} style={{ width: `${s.percentage}%`, backgroundColor: s.color }} title={`${s.label}: ${s.percentage}%`} />
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-xs">
+                    {TRAFFIC_SOURCES.map(s => (
+                      <div key={s.source} className="bg-[#0D0C0B] p-3 rounded-lg border border-[#C2A675]/20">
+                        <span className="font-serif text-[#C2A675] block font-bold">{s.label}</span>
+                        <div className="text-lg font-bold text-white mt-1">{s.visits.toLocaleString()} 人</div>
+                        <span className="text-[10px] text-stone-400">佔比 {s.percentage}% ｜ 轉換 {s.conv}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Ranking Table */}
+                <div className="bg-[#161513] p-6 rounded-xl border border-[#C2A675]/20 space-y-4 shadow-xl">
+                  <h3 className="font-serif font-bold text-lg text-white">商品瀏覽與加車排行榜 (Top Viewed Ranking)</h3>
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#0D0C0B] text-[#C2A675] font-serif border-b border-stone-800">
+                      <tr>
+                        <th className="p-3">排名</th>
+                        <th className="p-3">縮圖</th>
+                        <th className="p-3">SKU / 品名</th>
+                        <th className="p-3">瀏覽 PV</th>
+                        <th className="p-3">加購物車</th>
+                        <th className="p-3">LINE諮詢</th>
+                        <th className="p-3 text-right">轉換率</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-800">
+                      {TOP_RANKING.map((r, idx) => (
+                        <tr key={r.id} className="hover:bg-[#22201D]">
+                          <td className="p-3 font-serif font-bold text-[#C2A675]">#{idx + 1}</td>
+                          <td className="p-3"><img src={r.img} className="w-10 h-10 object-cover rounded border border-stone-700" /></td>
+                          <td className="p-3">
+                            <span className="font-mono text-[10px] text-[#C2A675]">#{r.sku}</span>
+                            <div className="font-serif font-bold text-white">{r.name}</div>
+                          </td>
+                          <td className="p-3 font-mono font-bold">{r.views} 次</td>
+                          <td className="p-3 font-mono text-[#C2A675]">{r.adds} 次</td>
+                          <td className="p-3 font-mono text-emerald-400">{r.inq} 次</td>
+                          <td className="p-3 font-mono text-right text-emerald-400 font-bold">{r.conv}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: 2000+ CSV/S3 匯入 */}
+            {tab === 'bulk' && (
+              <div className="space-y-6">
+                <h1 className="font-serif text-2xl font-bold">2,000+ 孤品 CSV/Excel 批次匯入與 Cloudflare R2 / S3 預檢器</h1>
+                <div className="bg-[#161513] p-8 rounded-xl border border-dashed border-[#C2A675]/40 text-center space-y-4 shadow-xl">
+                  <div className="text-sm font-serif text-white font-bold">點擊上傳 CSV 或將檔案拖曳至此處</div>
+                  <button onClick={() => alert('解析 CSV 完成！Cloudflare R2 雲端圖片匹配驗證完畢。')} className="px-6 py-2.5 bg-[#8C2D19] text-white font-serif text-xs rounded-lg font-bold shadow border border-[#C2A675]/30">
+                    模擬上傳 CSV 測試檔
+                  </button>
+                </div>
+
+                <div className="bg-[#161513] p-6 rounded-xl border border-[#C2A675]/20 space-y-4 text-xs shadow-xl">
+                  <h3 className="font-serif font-bold text-base text-white">Pre-flight 預檢詳細比對紀錄</h3>
+                  {BULK_ITEMS.map(item => (
+                    <div key={item.row} className={`p-4 rounded-xl border flex justify-between items-center ${item.imgMatch ? 'bg-[#0D0C0B] border-stone-800' : 'bg-rose-950/20 border-rose-800'}`}>
+                      <div>
+                        <span className="font-mono text-[#C2A675] font-bold">Row #{item.row} (#{item.sku})</span>
+                        <h4 className="font-serif font-bold text-white text-sm mt-0.5">{item.name}</h4>
+                        {item.err && <span className="text-rose-400 block mt-1">⚠️ {item.err}</span>}
+                      </div>
+                      <div className="flex gap-2 font-mono">
+                        <span className={`px-2.5 py-1 rounded ${item.imgMatch ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'}`}>
+                          {item.imgMatch ? 'S3 3圖匹配OK' : '圖片缺件'}
+                        </span>
+                        <span className={`px-2.5 py-1 rounded ${item.videoMatch ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}`}>
+                          {item.videoMatch ? '影片匹配OK' : '缺少影片'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tab 3: 訂單金流與保險專車 */}
+            {tab === 'orders' && (
+              <div className="space-y-6">
+                <h1 className="font-serif text-2xl font-bold">藏家訂單金流與全額保價專車送達</h1>
+                {orderList.map(ord => (
+                  <div key={ord.no} className="bg-[#161513] p-6 rounded-xl border border-[#C2A675]/20 space-y-4 shadow-xl">
+                    <div className="flex justify-between border-b border-stone-800 pb-3">
+                      <div>
+                        <span className="font-mono text-[#C2A675] font-bold">#{ord.no}</span>
+                        <h3 className="font-serif font-bold text-white text-base mt-0.5">買家：{ord.name} ({ord.phone})</h3>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-serif text-2xl font-bold text-[#8C2D19]">NT$ {ord.amount.toLocaleString()}</span>
+                        <span className="text-xs text-stone-400 block">付款狀態：{ord.status}</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-xs font-serif bg-[#0D0C0B] p-3 rounded-lg border border-stone-800">
+                      <div>
+                        <span>權威證書與鋼印檢核：</span>
+                        <button onClick={() => toggleCert(ord.no)} className={`ml-2 px-3 py-1 rounded font-bold ${ord.cert ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'}`}>
+                          {ord.cert ? '已完成複核 ✓' : '待檢核'}
+                        </button>
+                      </div>
+                      <div>
+                        <span className="text-stone-400">專車保險單號：</span>
+                        <span className="font-mono text-[#C2A675] font-bold ml-1">{ord.track}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tab 4: 行銷與 FB 直播控台 */}
+            {tab === 'live' && (
+              <div className="space-y-6">
+                <h1 className="font-serif text-2xl font-bold">FB 直播控台與本場推薦商品多選綁定</h1>
+                <div className="bg-[#161513] p-6 rounded-xl border border-[#C2A675]/20 space-y-4 shadow-xl">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-serif font-bold text-white text-base">多選綁定「本場推薦商品」({boundProducts.length} 件)</h3>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    {TOP_RANKING.map(p => {
+                      const isB = boundProducts.includes(p.id);
+                      return (
+                        <div key={p.id} onClick={() => toggleBound(p.id)} className={`p-3 rounded-lg border flex justify-between cursor-pointer ${isB ? 'bg-[#8C2D19]/20 border-[#8C2D19]' : 'bg-[#0D0C0B] border-stone-800'}`}>
+                          <div className="flex items-center gap-3">
+                            <img src={p.img} className="w-10 h-10 object-cover rounded border border-stone-700" />
+                            <div>
+                              <span className="font-mono text-[10px] text-[#C2A675]">#{p.sku}</span>
+                              <div className="font-serif font-bold text-white">{p.name}</div>
+                            </div>
+                          </div>
+                          <span className={`px-3 py-1.5 rounded font-serif ${isB ? 'bg-[#8C2D19] text-white font-bold' : 'bg-[#22201D] text-stone-400'}`}>
+                            {isB ? '已綁定直播現場 ✓' : '點擊綁定'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 5: 系統權限 */}
+            {tab === 'settings' && (
+              <div className="bg-[#161513] p-8 rounded-xl border border-[#C2A675]/20 space-y-4 font-serif text-xs shadow-xl">
+                <h2 className="text-xl font-bold text-white">系統權限與金流/R2 雲端 Key 設定</h2>
+                <p className="text-stone-400">綠界金流 Live Merchant ID: 3002199201 ｜ Cloudflare R2: media.oriental-art.tw</p>
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<AdminApp />);
+  </script>
+</body>
+</html>

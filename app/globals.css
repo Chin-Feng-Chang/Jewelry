@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-serif: 'Noto Serif TC', serif;
+  --font-sans: 'Noto Sans TC', sans-serif;
+}
+
+body {
+  background-color: #F7F6F2;
+  color: #262524;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .font-serif-oriental {
+  font-family: var(--font-serif);
+}
+
+/* 印章視覺樣式 */
+.oriental-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #8C2D19;
+  color: #8C2D19;
+  padding: 2px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 2px;
+  letter-spacing: 2px;
+}
+
+/* 霧金尊榮標籤 */
+.gold-badge {
+  background: linear-gradient(135deg, #C2A675 0%, #A38550 100%);
+  color: #FFFFFF;
+  font-size: 11px;
+  padding: 2px 8px;
+  letter-spacing: 1px;
+  border-radius: 1px;
+}
+
+/* 滾動條客製化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F6F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C2A675;
+  border-radius: 3px;
+}

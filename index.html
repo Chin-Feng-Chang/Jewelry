@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雅集典藏 | 宜興紫砂壺・緬甸翡翠・天然琥珀高單價東方藝術品專賣</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- React 18 & Babel CDN for client-side rendering -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            warmRice: '#F7F6F2',
+            obsidian: '#1A1918',
+            charcoal: '#262524',
+            subtleGray: '#73716B',
+            cinnabar: '#8C2D19',
+            matteGold: '#C2A675',
+            stoneBorder: '#E7E5E4'
+          },
+          fontFamily: {
+            serif: ['Noto Serif TC', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'Noto Sans TC', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #F7F6F2;
+      color: #262524;
+      font-family: 'Noto Sans TC', sans-serif;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, h5, h6, .font-serif {
+      font-family: 'Noto Serif TC', serif;
+    }
+    .oriental-seal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #8C2D19;
+      color: #8C2D19;
+      padding: 2px 6px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 2px;
+      letter-spacing: 2px;
+    }
+    .gold-badge {
+      background: linear-gradient(135deg, #C2A675 0%, #A38550 100%);
+      color: #FFFFFF;
+      font-size: 11px;
+      padding: 2px 8px;
+      letter-spacing: 1px;
+      border-radius: 1px;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #F7F6F2; }
+    ::-webkit-scrollbar-thumb { background: #C2A675; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo } = React;
+
+    // --- Mock Data ---
+    const MOCK_PRODUCTS = [
+      {
+        id: 'zs-001',
+        name: '顧景舟款・原礦老紫泥仿古壺',
+        category: 'zisha',
+        price: 188000,
+        originalPrice: 210000,
+        code: 'ZS-2026-088',
+        isUniquePiece: true,
+        inStock: true,
+        images: [
+          'https://images.unsplash.com/photo-1576092768241-dec231879fc3?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1597481499750-3e6b22637e12?q=80&w=1200&auto=format&fit=crop'
+        ],
+        videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-pouring-hot-tea-from-a-teapot-43183-large.mp4',
+        specs: {
+          origin: '宜興黃龍山原礦老紫泥',
+          dimensions: '容量 280cc / 長 14.2cm',
+          weight: '310g',
+          artist: '省級工藝美術大師・許逸民',
+          certificateNo: 'YX-ZS-2026-9021A',
+          craftType: '全手工拍打身筒、高溫還原燒製',
+          rarityLevel: '名家孤品 / 典藏級'
+        },
+        description: '採宜興黃龍山四號井優質老紫泥，熟泥陳腐逾三十載。壺體骨肉亭勻，腹部飽滿舒展，線條簡練流暢。出水如柱，開壺後發茶性極佳，養成後呈明潤古璞之光澤。',
+        story: '許逸民大師承襲國大師顧景舟一脈壺藝，歷時三個月手作而成。全壺未用任何模具輔助，壺蓋與壺口接縫嚴絲合縫，傾倒九十度而不落蓋，實乃紫砂壺中之神品。',
+        careGuide: '【開壺指南】收到後請以溫水沖洗去微塵，再以沸水潤壺三次。建議定壺定茶，專壺專用（推薦沖洗熟普洱或老白茶），使茶油漸次滲入砂粒孔隙。',
+        isFeatured: true
+      },
+      {
+        id: 'jd-001',
+        name: '緬甸老坑正陽綠玻璃種翡翠手鐲',
+        category: 'jade',
+        price: 368000,
+        originalPrice: 398000,
+        code: 'JD-2026-102',
+        isUniquePiece: true,
+        inStock: true,
+        images: [
+          'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1611591475777-233cd7542488?q=80&w=1200&auto=format&fit=crop'
+        ],
+        videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-sparkling-jewelry-41235-large.mp4',
+        specs: {
+          origin: '緬甸帕敢場口老坑料',
+          dimensions: '圈口 56.5mm / 條寬 13.8mm / 厚度 8.2mm',
+          weight: '62.4g',
+          artist: '揭陽玉雕名家巨擘',
+          certificateNo: 'GIA-JD-2026-88391',
+          craftType: '手工圓條切割、頂級鏡面拋光',
+          rarityLevel: '帝王珍藏級孤品'
+        },
+        description: '出自緬甸老坑帕敢場區，達到稀世玻璃種水。水頭足透，起瑩光且靈氣逼人。色彩呈現均勻濃郁之正陽綠，內部雪花棉微如晨霧，極具投資與傳家價值。',
+        story: '本手鐲原料出自2021年緬甸翡翠公盤標王原石，經國家級玉雕大師歷時半年順紋琢磨而成。起瑩度高達98%，在微光下亦自發清透水光。',
+        careGuide: '【保養須知】翡翠忌高溫與強酸鹼化學品。平時佩戴可由人體天然油脂滋養，若長期不佩戴，建議以純淨水浸泡半小時後，塗抹少許天然茶油密封保存。',
+        isFeatured: true
+      },
+      {
+        id: 'ab-001',
+        name: '天然緬甸金藍珀・大顆粒圓珠手串',
+        category: 'amber',
+        price: 98000,
+        originalPrice: 112000,
+        code: 'AB-2026-055',
+        isUniquePiece: true,
+        inStock: true,
+        images: [
+          'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1200&auto=format&fit=crop'
+        ],
+        videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-amber-stones-41120-large.mp4',
+        specs: {
+          origin: '緬甸克欽邦天然礦區（一億年形成）',
+          dimensions: '單珠直徑 18.5mm / 13顆',
+          weight: '48.6g',
+          artist: '緬甸琥珀傳承工坊',
+          certificateNo: 'NGTC-AB-2026-7712',
+          craftType: '全手工正圓磨珠、原礦正品',
+          rarityLevel: '珍稀金藍珀 / 博物館級'
+        },
+        description: '自然光下呈現溫潤金黃琥珀光澤，在黑背景或日光紫光波長下展現極致高貴的天天空藍色。內部包體純淨無雜，蘊含千百萬年古老地質能量。',
+        story: '緬甸琥珀是世界上最古老的琥珀品種之一，形成於白堊紀時期。金藍珀更是琥珀家族中最尊貴的品種，本手串每顆圓珠皆經過嚴格選料，色澤透度一氣呵成。',
+        careGuide: '【保養須知】琥珀硬度較低，請避免與硬物碰撞摩擦。定期使用軟布蘸取少許橄欖油輕輕擦拭，可保持其金藍幽光的透明感。',
+        isFeatured: true
+      },
+      {
+        id: 'zs-002',
+        name: '黃龍山本山段泥・西施壺',
+        category: 'zisha',
+        price: 68000,
+        code: 'ZS-2026-042',
+        isUniquePiece: true,
+        inStock: true,
+        images: [
+          'https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1576092768241-dec231879fc3?q=80&w=1200&auto=format&fit=crop'
+        ],
+        videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-pouring-hot-tea-from-a-teapot-43183-large.mp4',
+        specs: {
+          origin: '宜興黃龍山本山段泥',
+          dimensions: '容量 220cc',
+          weight: '240g',
+          artist: '高級工藝美術師・陳華',
+          certificateNo: 'YX-ZS-2026-5510'
+        },
+        description: '段泥顆粒質感分明，色呈米黃微溫潤，壺型宛若佳人，豐腴圓潤。泡飲綠茶或烏龍茶能完美襯托茶香清甜。'
+      },
+      {
+        id: 'jd-002',
+        name: '冰種飄翠花・觀音法相翡翠掛件',
+        category: 'jade',
+        price: 158000,
+        code: 'JD-2026-077',
+        isUniquePiece: true,
+        inStock: true,
+        images: [
+          'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=1200&auto=format&fit=crop'
+        ],
+        videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-sparkling-jewelry-41235-large.mp4',
+        specs: {
+          origin: '緬甸莫西沙場口',
+          dimensions: '長 58mm / 寬 36mm / 厚 7.5mm',
+          weight: '34.2g',
+          artist: '大師大巧玉雕作品',
+          certificateNo: 'GIA-JD-2026-9912'
+        },
+        description: '玉質冰爽通透，靈動翠花隨意飄逸於觀音衣袂之間。觀音面相莊嚴慈悲，開臉線條洗練流暢，寓意平安祥和。'
+      },
+      {
+        id: 'ab-002',
+        name: '波羅的海天然血珀・蓮花靜心雕件',
+        category: 'amber',
+        price: 52000,
+        code: 'AB-2026-031',
+        isUniquePiece: true,
+        inStock: false,
+        images: [
+          'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1200&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=1200&auto=format&fit=crop'
+        ],
+        videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-amber-stones-41120-large.mp4',
+        specs: {
+          origin: '波羅的海海料原礦',
+          dimensions: '高 45mm / 寬 32mm',
+          weight: '21.5g',
+          certificateNo: 'NGTC-AB-2026-1192'
+        },
+        description: '酒紅血珀晶瑩剔透，色如陳年紅酒般醇厚。精雕盛開蓮花，光線穿透時呈現絕美琥珀紅暈。目前已由台北藏家典藏售出。'
+      }
+    ];
+
+    // --- Main App Component ---
+    function App() {
+      const [view, setView] = useState('home'); // home | catalog | detail
+      const [category, setCategory] = useState('all');
+      const [selectedProduct, setSelectedProduct] = useState(MOCK_PRODUCTS[0]);
+
+      const [cart, setCart] = useState([
+        { product: MOCK_PRODUCTS[0], quantity: 1 }
+      ]);
+      const [isCartOpen, setIsCartOpen] = useState(false);
+      const [isLiveNow, setIsLiveNow] = useState(true);
+      const [quickViewProduct, setQuickViewProduct] = useState(null);
+      const [magnifier, setMagnifier] = useState({ show: false, x: 0, y: 0, bgX: 0, bgY: 0 });
+
+      // Magnifier lens handler
+      const handleMouseMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const bgX = (x / rect.width) * 100;
+        const bgY = (y / rect.height) * 100;
+        setMagnifier({ show: true, x, y, bgX, bgY });
+      };
+
+      const addToCart = (product) => {
+        setCart((prev) => {
+          const found = prev.find(i => i.product.id === product.id);
+          if (found) {
+            return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
+          }
+          return [...prev, { product, quantity: 1 }];
+        });
+        setIsCartOpen(true);
+      };
+
+      const totalCartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
+      const subtotal = cart.reduce((acc, i) => acc + i.product.price * i.quantity, 0);
+
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }, [view, isCartOpen, quickViewProduct, isLiveNow]);
+
+      return (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#F7F6F2]/90 border-b border-stone-200">
+            <div className="bg-[#1A1918] text-[#C2A675] text-xs py-1.5 px-4 text-center font-serif flex items-center justify-center gap-2">
+              <span>「名家傳世孤品・一物一拍一證」典藏滿 NT$100,000 即享恆溫防震專車送達</span>
+            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+              <div 
+                className="flex items-center gap-3 cursor-pointer"
+                onClick={() => { setView('home'); setCategory('all'); }}
+              >
+                <div className="oriental-seal font-serif text-lg py-1 px-2.5 bg-white border-[#8C2D19] text-[#8C2D19]">
+                  文人藏寶
+                </div>
+                <div>
+                  <span className="font-serif text-2xl font-bold tracking-widest text-[#262524]">雅集典藏</span>
+                  <span className="block text-[10px] text-[#73716B] tracking-wider uppercase">Oriental Luxury Gallery</span>
+                </div>
+              </div>
+
+              <nav className="hidden md:flex items-center space-x-8 font-serif text-sm">
+                {[
+                  { id: 'all', label: '全部鑑賞' },
+                  { id: 'zisha', label: '宜興紫砂' },
+                  { id: 'jade', label: '緬甸翡翠' },
+                  { id: 'amber', label: '天然琥珀' },
+                ].map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setCategory(cat.id); setView('catalog'); }}
+                    className={`py-2 ${category === cat.id && view === 'catalog' ? 'text-[#8C2D19] font-bold border-b-2 border-[#8C2D19]' : 'text-[#262524] hover:text-[#8C2D19]'}`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </nav>
+
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2.5 bg-[#1A1918] text-white hover:bg-[#8C2D19] rounded-full transition-colors shadow flex items-center justify-center"
+                >
+                  <i data-lucide="shopping-bag" className="w-4 h-4 text-[#C2A675]"></i>
+                  {totalCartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#8C2D19] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#F7F6F2]">
+                      {totalCartCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="flex-1">
+            {view === 'home' && (
+              <>
+                {/* Hero */}
+                <section className="relative h-[520px] bg-[#1A1918] text-white flex items-center">
+                  <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url(${MOCK_PRODUCTS[0].images[0]})` }}></div>
+                  <div className="relative max-w-7xl mx-auto px-6 lg:px-8 space-y-6">
+                    <span className="inline-block px-3 py-1 bg-[#8C2D19] text-white text-xs font-serif rounded">春泥溫潤・名家紫砂手作展</span>
+                    <h1 className="font-serif text-4xl sm:text-6xl font-bold text-white max-w-2xl leading-tight">
+                      顧景舟款・原礦老紫泥仿古壺
+                    </h1>
+                    <p className="text-stone-300 max-w-xl text-sm sm:text-base font-sans font-light">
+                      宜興黃龍山原礦老紫泥・熟泥陳腐逾三十載。國大師一脈全手工拍打孤品。
+                    </p>
+                    <div className="pt-4">
+                      <button
+                        onClick={() => { setView('catalog'); setCategory('all'); }}
+                        className="px-8 py-3.5 bg-[#8C2D19] hover:bg-[#A3341D] text-white font-serif text-sm tracking-widest rounded shadow-lg border border-[#C2A675]/40"
+                      >
+                        即刻入館鑑賞典藏
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                {/* FB Live Section */}
+                <section className="py-16 bg-[#1A1918] text-white border-y border-[#C2A675]/20">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col md:flex-row justify-between pb-6 border-b border-stone-800 gap-4">
+                      <div>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#8C2D19] text-white font-serif">
+                          LIVE FB 直播鑑賞中
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F7F6F2] mt-2">
+                          【FB 直播專區】名家紫砂與冰種翡翠 Live 典藏拍賣
+                        </h2>
+                      </div>
+                      <div className="flex items-center bg-stone-900 p-1 rounded border border-stone-800 self-start">
+                        <button
+                          onClick={() => setIsLiveNow(true)}
+                          className={`px-3 py-1 text-xs font-serif ${isLiveNow ? 'bg-[#8C2D19] text-white' : 'text-stone-400'}`}
+                        >
+                          狀態一：直播中
+                        </button>
+                        <button
+                          onClick={() => setIsLiveNow(false)}
+                          className={`px-3 py-1 text-xs font-serif ${!isLiveNow ? 'bg-[#C2A675] text-[#1A1918]' : 'text-stone-400'}`}
+                        >
+                          狀態二：預告倒數
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                      <div className="lg:col-span-8 bg-stone-900 rounded overflow-hidden border border-stone-800 relative aspect-video">
+                        {isLiveNow ? (
+                          <iframe
+                            className="w-full h-full object-cover opacity-90"
+                            src="https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&mute=1&controls=1&loop=1"
+                            title="FB Live Stream"
+                          />
+                        ) : (
+                          <div className="p-8 text-center flex flex-col justify-center items-center h-full">
+                            <span className="oriental-seal mb-2 border-[#C2A675] text-[#C2A675]">特展預告</span>
+                            <h3 className="text-2xl font-serif text-[#F7F6F2] font-bold">【極致玻璃種・緬甸帕敢翡翠私密專場】</h3>
+                            <div className="my-6 flex gap-4 text-center">
+                              <div className="bg-stone-800 p-3 rounded min-w-[60px]">
+                                <span className="block text-3xl font-serif text-[#C2A675] font-bold">14</span>
+                                <span className="text-[10px] text-stone-400">時</span>
+                              </div>
+                              <div className="bg-stone-800 p-3 rounded min-w-[60px]">
+                                <span className="block text-3xl font-serif text-[#C2A675] font-bold">28</span>
+                                <span className="text-[10px] text-stone-400">分</span>
+                              </div>
+                              <div className="bg-stone-800 p-3 rounded min-w-[60px]">
+                                <span className="block text-3xl font-serif text-[#8C2D19] font-bold">45</span>
+                                <span className="text-[10px] text-stone-400">秒</span>
+                              </div>
+                            </div>
+                            <button className="px-6 py-2.5 bg-[#8C2D19] text-white font-serif text-xs rounded">
+                              預約 FB / LINE 開播通知
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 本場主推商品 */}
+                      <div className="lg:col-span-4 bg-stone-900 border border-stone-800 p-6 rounded flex flex-col justify-between">
+                        <div>
+                          <div className="text-xs font-serif text-[#C2A675] mb-2">★ 本場直播主推大作</div>
+                          <img src={MOCK_PRODUCTS[0].images[0]} className="w-full h-44 object-cover rounded mb-3" />
+                          <h4 className="font-serif text-lg font-bold text-white">{MOCK_PRODUCTS[0].name}</h4>
+                          <p className="text-xs text-stone-400 mt-1 line-clamp-2">{MOCK_PRODUCTS[0].description}</p>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-stone-800 flex items-center justify-between">
+                          <div>
+                            <span className="text-xs text-stone-400 block font-serif">直播典藏價</span>
+                            <span className="text-xl font-serif font-bold text-[#C2A675]">NT$ {MOCK_PRODUCTS[0].price.toLocaleString()}</span>
+                          </div>
+                          <button
+                            onClick={() => addToCart(MOCK_PRODUCTS[0])}
+                            className="px-4 py-2 bg-[#8C2D19] text-white font-serif text-xs rounded shadow"
+                          >
+                            搶先認購孤品
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Categories */}
+                <section className="py-20 bg-[#F7F6F2]">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <span className="oriental-seal font-serif mb-2">三大雅集主題</span>
+                    <h2 className="text-3xl font-serif font-bold text-[#262524] mb-12">精選東方藝術品分類</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                      {[
+                        { id: 'zisha', title: '宜興紫砂', subtitle: '黃龍山老泥・名家全手工拍打壺', img: MOCK_PRODUCTS[0].images[0] },
+                        { id: 'jade', title: '緬甸翡翠', subtitle: '老坑玻璃種・正陽綠大師雕琢佩飾', img: MOCK_PRODUCTS[1].images[0] },
+                        { id: 'amber', title: '天然琥珀', subtitle: '億年金藍珀・波羅的海自然血珀', img: MOCK_PRODUCTS[2].images[0] }
+                      ].map(cat => (
+                        <div
+                          key={cat.id}
+                          onClick={() => { setCategory(cat.id); setView('catalog'); }}
+                          className="group relative h-96 rounded overflow-hidden cursor-pointer shadow border border-stone-200"
+                        >
+                          <div className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: `url(${cat.img})` }}></div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1918]/90 via-transparent to-transparent"></div>
+                          <div className="absolute bottom-6 left-6 text-white">
+                            <h3 className="font-serif text-2xl font-bold">{cat.title}</h3>
+                            <p className="text-xs text-stone-300 mt-1">{cat.subtitle}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              </>
+            )}
+
+            {view === 'catalog' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="border-b border-stone-200 pb-6 mb-8 flex justify-between items-end">
+                  <div>
+                    <span className="oriental-seal font-serif mb-1">雅集大觀</span>
+                    <h1 className="text-3xl font-serif font-bold text-[#262524]">全部典藏藝品鑑賞</h1>
+                  </div>
+                  <div className="flex gap-2">
+                    {['all', 'zisha', 'jade', 'amber'].map(c => (
+                      <button
+                        key={c}
+                        onClick={() => setCategory(c)}
+                        className={`px-3 py-1 text-xs font-serif rounded ${category === c ? 'bg-[#8C2D19] text-white' : 'bg-white border text-stone-700'}`}
+                      >
+                        {c === 'all' ? '全部' : c === 'zisha' ? '紫砂' : c === 'jade' ? '翡翠' : '琥珀'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {MOCK_PRODUCTS.filter(p => category === 'all' || p.category === category).map(p => (
+                    <div key={p.id} className="bg-white rounded border border-stone-200 overflow-hidden shadow-sm flex flex-col justify-between">
+                      <div className="cursor-pointer" onClick={() => { setSelectedProduct(p); setView('detail'); }}>
+                        <div className="aspect-square relative overflow-hidden bg-stone-100">
+                          <img src={p.images[0]} className="w-full h-full object-cover hover:scale-105 transition-transform" />
+                          <span className="absolute top-2 left-2 gold-badge">孤品編號 #{p.code}</span>
+                        </div>
+                        <div className="p-4">
+                          <span className="text-[10px] text-[#73716B] font-serif">【{p.specs.origin}】</span>
+                          <h3 className="font-serif text-lg font-bold text-[#262524]">{p.name}</h3>
+                          <p className="text-xs text-[#73716B] mt-1 line-clamp-2">{p.description}</p>
+                        </div>
+                      </div>
+                      <div className="p-4 border-t flex justify-between items-center bg-stone-50">
+                        <span className="font-serif font-bold text-[#8C2D19] text-lg">NT$ {p.price.toLocaleString()}</span>
+                        <button
+                          onClick={() => addToCart(p)}
+                          className="px-3 py-1.5 bg-[#1A1918] hover:bg-[#8C2D19] text-white font-serif text-xs rounded"
+                        >
+                          認購孤品
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {view === 'detail' && selectedProduct && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <button onClick={() => setView('catalog')} className="text-xs font-serif text-[#73716B] hover:text-[#8C2D19] mb-6">
+                  ← 返回典藏藝品清單
+                </button>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 bg-white p-8 rounded-lg border border-stone-200">
+                  {/* Left: Magnifier Image */}
+                  <div className="lg:col-span-7">
+                    <div 
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={() => setMagnifier({ show: false })}
+                      className="relative aspect-square rounded overflow-hidden bg-stone-100 border cursor-crosshair"
+                    >
+                      <img src={selectedProduct.images[0]} className="w-full h-full object-cover" />
+                      {magnifier.show && (
+                        <div
+                          className="absolute w-44 h-44 rounded-full border-2 border-[#C2A675] shadow-2xl pointer-events-none overflow-hidden"
+                          style={{
+                            top: `${magnifier.y - 88}px`,
+                            left: `${magnifier.x - 88}px`,
+                            backgroundImage: `url(${selectedProduct.images[0]})`,
+                            backgroundPosition: `${magnifier.bgX}% ${magnifier.bgY}%`,
+                            backgroundSize: '350%'
+                          }}
+                        />
+                      )}
+                    </div>
+                    <div className="text-[11px] text-stone-500 font-serif mt-2 text-center">
+                      ★ 滑鼠懸停於圖片上可啟動微距放大鏡鑑賞泥料質感或水頭質地
+                    </div>
+                  </div>
+
+                  {/* Right: Info */}
+                  <div className="lg:col-span-5 space-y-6">
+                    <span className="gold-badge">獨家一物一拍孤品 #{selectedProduct.code}</span>
+                    <h1 className="font-serif text-3xl font-bold text-[#262524]">{selectedProduct.name}</h1>
+                    <div className="bg-[#F7F6F2] p-4 rounded border">
+                      <span className="text-xs text-[#73716B] font-serif">藏家典藏專屬價</span>
+                      <div className="text-3xl font-serif font-bold text-[#8C2D19] mt-1">
+                        NT$ {selectedProduct.price.toLocaleString()}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-xs font-sans border-y py-4">
+                      <div><strong>泥料產地：</strong>{selectedProduct.specs.origin}</div>
+                      <div><strong>規格容量：</strong>{selectedProduct.specs.dimensions}</div>
+                      <div><strong>淨重數據：</strong>{selectedProduct.specs.weight}</div>
+                      {selectedProduct.specs.artist && <div><strong>大師作工：</strong><span className="text-[#8C2D19] font-bold">{selectedProduct.specs.artist}</span></div>}
+                      {selectedProduct.specs.certificateNo && <div><strong>鑑定字號：</strong>{selectedProduct.specs.certificateNo}</div>}
+                    </div>
+
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => addToCart(selectedProduct)}
+                        className="w-full py-3.5 bg-[#8C2D19] text-white font-serif text-sm rounded font-bold shadow"
+                      >
+                        加入購物車並保留孤品
+                      </button>
+                      <a
+                        href="https://line.me"
+                        target="_blank"
+                        className="w-full py-3 bg-[#06C755] text-white font-serif text-xs rounded flex items-center justify-center gap-2"
+                      >
+                        LINE 專人一對一諮詢品相
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* Cart Drawer */}
+          {isCartOpen && (
+            <div className="fixed inset-0 z-50 overflow-hidden">
+              <div onClick={() => setIsCartOpen(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+              <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+                <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between">
+                  <div className="p-6 bg-[#1A1918] text-white flex justify-between items-center">
+                    <h2 className="font-serif text-lg font-bold">雅集典藏購物車 ({cart.length})</h2>
+                    <button onClick={() => setIsCartOpen(false)} className="text-stone-400 hover:text-white">✕</button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {cart.map((item, idx) => (
+                      <div key={idx} className="flex gap-4 p-3 bg-[#F7F6F2] rounded border">
+                        <img src={item.product.images[0]} className="w-16 h-16 object-cover rounded" />
+                        <div className="flex-1">
+                          <h4 className="font-serif text-sm font-bold">{item.product.name}</h4>
+                          <span className="text-xs text-[#8C2D19] font-bold block mt-1">NT$ {item.product.price.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-6 bg-stone-50 border-t space-y-4">
+                    <div className="flex justify-between font-serif font-bold text-lg text-[#8C2D19]">
+                      <span>總計 Total</span>
+                      <span>NT$ {subtotal.toLocaleString()}</span>
+                    </div>
+                    <button
+                      onClick={() => alert('感謝認購！即將轉接專人安排全額保價恆溫專車送達。')}
+                      className="w-full py-3.5 bg-[#8C2D19] text-white font-serif text-sm rounded shadow font-bold"
+                    >
+                      前往結帳認購
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Footer */}
+          <footer className="bg-[#1A1918] text-white py-12 border-t border-[#C2A675]/20 font-serif text-center text-xs text-stone-400">
+            <p>© 2026 雅集典藏 Oriental Luxury Gallery. 一物一拍・名家孤品權威鑑定。</p>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
